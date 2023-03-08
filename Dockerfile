@@ -2,7 +2,7 @@
 FROM ghcr.io/linuxserver/baseimage-alpine:3.16 as buildstage
 
 # set NZBGET version
-ARG NZBGET_RELEASE
+ARG NZBGET_RELEASE=latest
 
 RUN \
   echo "**** install build packages ****" && \
@@ -17,14 +17,13 @@ RUN \
     openssl-dev && \
   echo "**** build nzbget ****" && \
   if [ -z ${NZBGET_RELEASE+x} ]; then \
-    NZBGET_RELEASE=$(curl -sX GET "https://api.github.com/repos/nzbget/nzbget/releases/latest" \
+    NZBGET_RELEASE=$(curl -sX GET "https://api.github.com/repos/nzbget-ng/nzbget/releases/latest" \
       | awk '/tag_name/{print $4;exit}' FS='[""]'); \
   fi && \
   mkdir -p /app/nzbget && \
-  git clone https://github.com/nzbget/nzbget.git nzbget && \
+  git clone https://github.com/nzbget-ng/nzbget.git nzbget && \
   cd nzbget/ && \
   git checkout ${NZBGET_RELEASE} && \
-  git cherry-pick -n fa57474d && \
   ./configure \
     bindir='${exec_prefix}' && \
   make && \
@@ -60,7 +59,7 @@ ARG UNRAR_VERSION=6.1.7
 ARG BUILD_DATE
 ARG VERSION
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="thelamer"
+LABEL maintainer="mc303"
 
 RUN \
   echo "**** install build packages ****" && \
